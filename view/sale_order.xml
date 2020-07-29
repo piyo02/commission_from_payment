@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="commission_type_so" model="ir.ui.view">
+        <field name="name">sale.order.form.commission</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <field name="payment_term_id" position="after">
+                <field name="commission"/>
+            </field>
+            <field name="amount_total" position="after">
+                <field name="commission_total"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
