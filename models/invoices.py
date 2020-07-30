@@ -50,7 +50,6 @@ class Settlement(models.Model):
                     if not line.product_id.commission_free:
                         total += line.price_subtotal
             record.total_invoice = total_
-            _logger.warning(record.total_invoice)
             record.total_settled = total
     
     def action_validated(self):
