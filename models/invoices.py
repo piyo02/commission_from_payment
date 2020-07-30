@@ -24,16 +24,29 @@ class Settlement(models.Model):
     invoice = fields.Many2one(
         comodel_name="account.invoice", string="Generated invoice",
         readonly=True)
+    commission = fields.Many2one(
+        comodel_name="sale.commission")
 
-    @api.depends('lines', 'lines.settled_amount')
+    @api.depends('lines', 'total_invoice')
     def _compute_total(self):
         for record in self:
-            record.total = sum(x.settled_amount for x in record.lines)
+            if record.commission.commission_type == "fixed":
+                record.total = (record.total_invoice*record.commission.fix_qty)/100
+            elif record.commission.commission_type == "section":
+                for section in record.commission.sections:
+                    if section.amount_from < record.total_invoice < section.amount_to:
+                        record.total = (record.total_invoice*section.percent)/100
     
-    @api.depends('lines', 'lines.settled_amount')
+    @api.depends('lines')
     def _compute_total_invoice(self):
         for record in self:
-            record.total_invoice = sum(x.invoice.amount_total for x in record.lines)
+            total = 0
+            for invoice in record.lines:
+                for line in invoice.invoice.invoice_line_ids:
+                    record.commission = invoice.invoice.commission.id
+                    if not line.product_id.commission_free:
+                        total += line.price_subtotal
+            record.total_invoice = total
     
     def action_validated(self):
         if any(x.state != 'draft' for x in self):
@@ -60,8 +73,5 @@ class SettlementLines(models.Model):
     )
     invoice = fields.Many2one(
         comodel_name='account.invoice', store=True, string="Invoice")
+    total_invoice = fields.Float(readonly=True, store=True)
     date = fields.Date(store=True)
-    commission = fields.Many2one(
-        comodel_name="sale.commission")
-    settled_amount = fields.Float(
-        readonly=True, store=True)

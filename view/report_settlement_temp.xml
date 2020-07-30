@@ -25,16 +25,14 @@
                                 <tr>
                                     <th>Invoice date</th>
                                     <th>Invoice</th>
-                                    <th>Commission</th>
-                                    <th class="text-right">Amount settled</th>
+                                    <th class="text-right">Total Invoice</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="o.lines" t-as="l">
                                     <td><span t-field="l.date"/></td>
                                     <td><span t-field="l.invoice"/></td>
-                                    <td><span t-field="l.commission"/></td>
-                                    <td class="text-right"><span t-field="l.settled_amount" /></td>
+                                    <td class="text-right"><span t-field="l.total_invoice" /></td>
                                 </tr>
                             </tbody>
                         </table>

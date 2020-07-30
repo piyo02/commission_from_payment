@@ -57,8 +57,7 @@ class CommissionInvoices(models.Model):
                         'settlement': settlement.id,
                         'invoice': invoice.id,
                         'date': invoice.date_invoice,
-                        'settled_amount': invoice.commission_total,
-                        'commission': invoice.commission.id })
+                        'total_invoice': invoice.amount_total})
 
         if len(settlement_ids):
             return {

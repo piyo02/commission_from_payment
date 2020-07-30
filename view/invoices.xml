@@ -12,12 +12,6 @@
             <xpath expr="//field[@name='date_due']" position="after">
                 <field name="settled" invisible="1"/>
             </xpath>
-            <xpath expr="//field[@name='amount_total']" position="after">
-                <field name="commission_total"
-                       widget="monetary"
-                       options="{'currency_field': 'currency_id'}"
-                       />
-            </xpath>
         </field>
     </record>
 
@@ -56,8 +50,7 @@
                         <tree string="Settlement lines">
                             <field name="date"/>
                             <field name="invoice"/>
-                            <field name="commission"/>
-                            <field name="settled_amount"/>
+                            <field name="total_invoice"/>
                         </tree>
                     </field>
                 </group>
