@@ -8,6 +8,7 @@
     'depends': ['base', 'sale', 'account'],
     'data': [
         'menu.xml',
+        'security/ir.model.access.csv',
         'view/commision_type.xml',
         'view/invoices.xml',
         'view/partner.xml',

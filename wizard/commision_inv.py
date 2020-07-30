@@ -48,7 +48,7 @@ class CommissionInvoices(models.Model):
                 settlement = settlement_obj.create({
                     'agent': agent.id,
                     'date_from': date_from,
-                    'date_to': self.date_to,
+                    'date_to': date_to,
                 })
 
                 settlement_ids.append(settlement.id)

@@ -8,6 +8,7 @@ class Settlement(models.Model):
 
     name = fields.Char('Name')
     total = fields.Float(compute="_compute_total", readonly=True, store=True)
+    total_invoice = fields.Float(compute="_compute_total_invoice", readonly=True, store=True)
     date_from = fields.Date(string="From")
     date_to = fields.Date(string="To")
     agent = fields.Many2one(
@@ -28,6 +29,11 @@ class Settlement(models.Model):
     def _compute_total(self):
         for record in self:
             record.total = sum(x.settled_amount for x in record.lines)
+    
+    @api.depends('lines', 'lines.settled_amount')
+    def _compute_total_invoice(self):
+        for record in self:
+            record.total_invoice = sum(x.invoice.amount_total for x in record.lines)
     
     def action_validated(self):
         if any(x.state != 'draft' for x in self):

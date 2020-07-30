@@ -16,7 +16,7 @@
                 <field name="commission_total"
                        widget="monetary"
                        options="{'currency_field': 'currency_id'}"
-                       invisible="1"/>
+                       />
             </xpath>
         </field>
     </record>
@@ -39,11 +39,16 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <group>
+                    <field name="agent"/>
+                </group>
+                <group>
                     <group>
                         <field name="date_from"/>
+                        <field name="total_invoice"/>
                     </group>
                     <group>
                         <field name="date_to"/>
+                        <field name="total" widget="monetary" string="Total Commission"/>
                     </group>
                 </group>
                 <group string="Commission lines" colspan="4">
@@ -55,11 +60,6 @@
                             <field name="settled_amount"/>
                         </tree>
                     </field>
-                </group>
-                <group class="oe_subtotal_footer oe_right">
-                    <field name="total"
-                           class="oe_subtotal_footer_separator"
-                           widget="monetary"/>
                 </group>
             </form>
         </field>
