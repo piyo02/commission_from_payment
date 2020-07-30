@@ -9,12 +9,6 @@
             <field name="payment_term_id" position="after">
                 <field name="commission"/>
             </field>
-            <field name="amount_total" position="after">
-                <field name="commission_total"
-                       widget="monetary"
-                       options="{'currency_field': 'currency_id'}"
-                       invisible="1"/>
-            </field>
         </field>
     </record>
 

@@ -7,8 +7,9 @@ class Settlement(models.Model):
     _name = "sale.commission.settlement"
 
     name = fields.Char('Name')
+    total_settled = fields.Float(compute="_compute_total_settled", readonly=True, store=True)
+    total_invoice = fields.Float('Total Invoice')
     total = fields.Float(compute="_compute_total", readonly=True, store=True)
-    total_invoice = fields.Float(compute="_compute_total_invoice", readonly=True, store=True)
     date_from = fields.Date(string="From")
     date_to = fields.Date(string="To")
     agent = fields.Many2one(
@@ -27,26 +28,30 @@ class Settlement(models.Model):
     commission = fields.Many2one(
         comodel_name="sale.commission")
 
-    @api.depends('lines', 'total_invoice')
+    @api.depends('lines', 'total_settled')
     def _compute_total(self):
         for record in self:
             if record.commission.commission_type == "fixed":
-                record.total = (record.total_invoice*record.commission.fix_qty)/100
+                record.total = (record.total_settled*record.commission.fix_qty)/100
             elif record.commission.commission_type == "section":
                 for section in record.commission.sections:
-                    if section.amount_from < record.total_invoice < section.amount_to:
-                        record.total = (record.total_invoice*section.percent)/100
+                    if section.amount_from < record.total_settled < section.amount_to:
+                        record.total = (record.total_settled*section.percent)/100
     
     @api.depends('lines')
-    def _compute_total_invoice(self):
+    def _compute_total_settled(self):
         for record in self:
+            total_ = 0
             total = 0
             for invoice in record.lines:
                 for line in invoice.invoice.invoice_line_ids:
+                    total_ += line.price_subtotal
                     record.commission = invoice.invoice.commission.id
                     if not line.product_id.commission_free:
                         total += line.price_subtotal
-            record.total_invoice = total
+            record.total_invoice = total_
+            _logger.warning(record.total_invoice)
+            record.total_settled = total
     
     def action_validated(self):
         if any(x.state != 'draft' for x in self):

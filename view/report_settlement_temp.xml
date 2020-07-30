@@ -20,6 +20,8 @@
                             </div>
                         </div>
 
+                        <t t-set="total_free_comm" t-value="0" />
+                        <t t-set="total_invoice" t-value="0" />
                         <table class="table table-condensed table-striped">
                             <thead>
                                 <tr>
@@ -32,22 +34,39 @@
                                 <tr t-foreach="o.lines" t-as="l">
                                     <td><span t-field="l.date"/></td>
                                     <td><span t-field="l.invoice"/></td>
-                                    <td class="text-right"><span t-field="l.total_invoice" /></td>
+                                    <td class="text-right">
+                                        <span t-field="l.total_invoice" />
+                                        <t t-set="total_invoice" t-value="total_invoice + l.total_invoice" />
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="row">
-                            <div class="col-xs-4 pull-right">
+                            <div class="col-xs-6 pull-right">
                                 <table class="table table-condensed">
                                     <tr>
-                                        <td><strong>Total Invoice</strong></td>
+                                        <td><strong>Total Invoice Real</strong></td>
                                         <td class="text-right">
-                                            <span t-field="o.total_invoice" />
+                                            <!-- <span t-field="o.total_invoice" /> -->
+                                            <span t-esc="'{:,.2f}'.format(total_invoice)"/>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Total Commission</strong></td>
+                                        <td><strong>Total Produk Free Komisi</strong></td>
+                                        <td class="text-right">
+                                            <t t-set="total_free_comm" t-value="total_invoice - o.total_settled" />
+                                            <span t-esc="total_free_comm" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Settled</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.total_settled" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total Komisi</strong></td>
                                         <td class="text-right">
                                             <span t-field="o.total" />
                                         </td>
