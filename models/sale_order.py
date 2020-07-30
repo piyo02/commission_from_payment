@@ -12,11 +12,11 @@ class SaleOrder(models.Model):
         for order in self:
             order.commission_total = 0.0
             if order.commission.commission_type == "fixed":
-                order.commission_total = order.amount_total*order.commission.fix_qty
+                order.commission_total = (order.amount_total*order.commission.fix_qty)/100
             elif order.commission.commission_type == "section":
                 for section in order.commission.sections:
                     if section.amount_from < order.amount_total < section.amount_to:
-                        order.commission_total = order.amount_total*section.percent
+                        order.commission_total = (order.amount_total*section.percent)/100
 
     commission_total = fields.Float(
         string="Commissions", compute="_compute_commission_total",
@@ -24,5 +24,11 @@ class SaleOrder(models.Model):
     commission = fields.Many2one(
         comodel_name="sale.commission",
         ondelete="restrict",
+        compute="change_commission",
+        related="user_id.commission",
         required=True,
     )
+
+    @api.depends('user_id')
+    def change_commission(self):
+        self.commission = self.user_id.commission

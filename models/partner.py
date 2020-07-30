@@ -11,6 +11,7 @@ class ResPartner(models.Model):
         comodel_name="res.partner", relation="partner_agent_rel",
         column1="partner_id", column2="agent_id",
         domain=[('agent', '=', True)])
+    commission = fields.Many2one(comodel_name="sale.commission", string="Commission")
     agent = fields.Boolean(
         string="Creditor/Agent",
         help="Check this field if the partner is a creditor or an agent.")

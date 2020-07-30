@@ -11,6 +11,7 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='sales_purchases']//field[@name='supplier']" position="after">
                 <field name="agent" string="Agent" />
+                <field name="commission" string="Commission" />
             </xpath>
         </field>
     </record>
