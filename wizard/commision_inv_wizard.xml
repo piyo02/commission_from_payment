@@ -9,13 +9,17 @@
                     <group>
                         <field name="agent_id"/>
                     </group>
+                    <h2>Tanggal Pembayaran</h2>
                     <group>
                         <group>
-                            <field name="date_to"/>
+                            <field name="start_date"/>
                         </group>
                         <group>
-                            <field name="day_term"/>
+                            <field name="end_date"/>
                         </group>
+                    </group>
+                    <group>
+                        <field name="day_term"/>
                     </group>
                     <footer>
                         <button name="create_commission" string="Create Commission" class="oe_highlight"

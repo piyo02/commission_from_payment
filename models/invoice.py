@@ -13,8 +13,6 @@ class SaleOrder(models.Model):
         related="user_id.commission",
         required=True,
     )
-    settled = fields.Boolean(
-        string="Settled", readonly=True, default=False)
 
     @api.depends('user_id')
     def change_commission(self):

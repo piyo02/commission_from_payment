@@ -16,14 +16,6 @@ class CommisionManagement(models.Model):
     sections = fields.One2many(
         comodel_name="sale.commission.section", inverse_name="commission")
     active = fields.Boolean(default=True)
-    invoice_state = fields.Selection(
-        [('open', 'Invoice Based'),
-         ('paid', 'Payment Based')], string='Invoice Status',
-        required=True, default='open')
-    amount_base_type = fields.Selection(
-        selection=[('gross_amount', 'Gross Amount'),
-                   ('net_amount', 'Net Amount')],
-        string='Base', required=True, default='gross_amount')
 
     @api.multi
     def calculate_section(self, base):

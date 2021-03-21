@@ -9,15 +9,16 @@ class CommissionInvoices(models.Model):
     agent_id = fields.Many2many(
         comodel_name="res.partner",
         ondelete="restrict",
-        string="Agent",
+        string="Sales",
         domain="[('agent', '=', True)]"
     )
     day_term = fields.Integer(
-        string="Batas Jatuh Tempo",
+        string="Umur Piutang",
         required=True,
         default=63 
     )
-    date_to = fields.Date('Up to', required=True, default=fields.Date.today())
+    start_date = fields.Date('Tanggal Awal', required=True )
+    end_date = fields.Date('Tanggal Akhir', required=True )
     
     @api.multi
     def create_commission(self):
@@ -26,39 +27,57 @@ class CommissionInvoices(models.Model):
         settlement_line_obj = self.env['sale.commission.settlement.line']
         settlement_ids = []
 
-        _date = fields.Date.from_string(self.date_to)
-        if isinstance(_date, basestring):
-            _date = fields.Date.from_string(_date)
-        date_to = date(month=_date.month, year=_date.year, day=1)
+        date_to = date.today()
         date_from = date_to - timedelta(days=self.day_term)
 
         if not self.agent_id:
             self.agent_id = self.env['res.partner'].search(
                 [('agent', '=', True)])
-        
+        payment_has_get = []
         for agent in self.agent_id:
-            invoices = self.env['account.invoice'].search(
-                [('date_invoice', '>=', date_from),
-                ('date_invoice', '<', date_to),
+            invoices = self.env['account.invoice'].search([
+                ('date_invoice', '>=', date_from),
+                ('date_invoice', '<=', date_to),
                 ('user_id.name', '=', agent.name),
-                ('state', '=', 'paid'),
-                ('settled', '=', False)], order="date_invoice")
+            ], order="date_invoice")
 
-            if invoices:
+            list_payment = []
+            for invoice in invoices:
+                payments = self.env['account.payment'].search([
+                    ('payment_date', '>=', self.start_date),
+                    ('payment_date', '<=', self.end_date),
+                    ('payment_type', '=', 'inbound'),
+                    ('state', '=', 'posted'),
+                    ('invoice_ids.number', '=', invoice.number),
+                    ('settled', '=', False)
+                ])
+
+                for payment in payments:
+                    if payment.id in payment_has_get:
+                        continue
+                    
+                    payment_has_get.append(payment.id)
+                    detail = []
+                    detail.append(invoice)
+                    detail.append(payment)
+                    list_payment.append(detail)
+
+            if len(list_payment):
                 settlement = settlement_obj.create({
                     'agent': agent.id,
-                    'date_from': date_from,
-                    'date_to': date_to,
+                    'date_from': self.start_date,
+                    'date_to': self.end_date,
                 })
-
                 settlement_ids.append(settlement.id)
-                for invoice in invoices:
+
+                for payment in list_payment:
                     settlement_line_obj.create({
                         'settlement': settlement.id,
-                        'invoice': invoice.id,
-                        'date': invoice.date_invoice,
-                        'total_invoice': invoice.amount_total})
-
+                        'invoice': payment[0].id,
+                        'payment': payment[1].id,
+                        'date': payment[1].payment_date,
+                        'total_payment': payment[1].amount})
+                    
         if len(settlement_ids):
             return {
                 'name': _('Created Settlements'),
